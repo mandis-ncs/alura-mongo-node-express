@@ -1,31 +1,26 @@
 import express from "express"
+import connectToDatabase from "./config/dbConnect.js";
+import book from "./models/Book.js"
+
+const connect = await connectToDatabase();
+connect.on("error", (error) => {
+    console.error("error connecting on database", error);
+});
+
+connect.once("open", () => {
+    console.log("Succesfully connected to database");
+});
 
 const app = express();
 app.use(express.json()); //middleware to parse from string to json
-
-const books = [
-    {
-        id: 1,
-        title: "A"
-    },
-    {
-        id: 1,
-        title: "B"
-    },
-]
-
-function searchBook(id) {
-    return books.findIndex(book => {
-        return book.id === Number(id);
-    });
-}
 
 app.get("/", (req, res) => {
     res.status(200).send("Node Js");
 });
 
-app.get("/books", (req, res) => {
-    res.status(200).json(books);
+app.get("/books", async (req, res) => {
+    const list = await book.find({});
+    res.status(200).json(list);
 });
 
 app.get("/books/:id", (req, res) => {
